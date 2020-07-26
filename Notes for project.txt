@@ -1,0 +1,9 @@
+Notes for project
+
+Internal color	Purpose	Input	    Gameport	Aux port
+Blue wire	    +5V		            1
+Purple wire	    X2	    Rudder	    11
+Black wire	    Aux Y1	Right brake	            6
+Brown wire	    Aux X1	Left brake	            3
+
+Potentiometers are all 100k
