@@ -16,7 +16,7 @@ int rawAnalogValue[NUM_AXES][SAMPLES_PER_READING];
 char filteredValue[NUM_AXES];
 
 
-BleRudder bleRudder;
+BleRudder bleRudder("Pro Pedals BT", "CH Products", 100);
 
 void setup()
 {
@@ -43,7 +43,7 @@ void handleAxes() {
     filterValues();
     printValues();  // Print readings to serial port, remove if not debugging
 
-    bleRudder.setAxes(filteredValue[rudder], 0, 0, 0, 0, 0, DPAD_CENTERED); // TODO: modify this to send all axis values
+    bleRudder.setAxes(filteredValue[rudder], filteredValue[leftBrake], filteredValue[rightBrake]);
   }
 }
 
