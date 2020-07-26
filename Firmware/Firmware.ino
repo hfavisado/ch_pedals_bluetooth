@@ -5,18 +5,23 @@
 //#define DEBUG // uncomment this to enable logging
 
 #define NUM_AXES 3
-enum axes {rudder, leftBrake, rightBrake};
-const int pins[] = {34, 36, 39};      // rudder on pin 34, left brake on pin 36, right brake on pin 39
+enum axes {leftBrake, rightBrake, rudder};
+const int pins[] = {34, 36, 39};      // left brake on pin 34, right brake on pin 36, rudder on pin 39
 
+#define MIDDLE_THRESHOLD              {2048, 2048, 2048}
 #define SAMPLES_PER_READING           5 // Number of pot samples to take (to smooth the values)
 #define DELAY_BETWEEN_SAMPLES_MS      4 // Delay in milliseconds between pot samples
 #define DELAY_BETWEEN_HID_REPORTS_MS  5 // Additional delay in milliseconds between HID reports
 
 int rawAnalogValue[NUM_AXES][SAMPLES_PER_READING];
+int maxValue[NUM_AXES] = MIDDLE_THRESHOLD;
+int minValue[NUM_AXES] = MIDDLE_THRESHOLD;
+int maxMapped[NUM_AXES] = {255, 255, 127};
+int minMapped[NUM_AXES] = {0, 0, -127};
 char filteredValue[NUM_AXES];
 
 
-BleRudder bleRudder("Pro Pedals BT", "CH Products", 100);
+BleRudder bleRudder("Pro Pedals BT", "CH Products");
 
 void setup()
 {
@@ -41,9 +46,9 @@ void handleAxes() {
   {
     readAdc();
     filterValues();
-    printValues();  // Print readings to serial port, remove if not debugging
+    printValues();
 
-    bleRudder.setAxes(filteredValue[rudder], filteredValue[leftBrake], filteredValue[rightBrake]);
+    bleRudder.setAxes(filteredValue[leftBrake], filteredValue[rightBrake], filteredValue[rudder]);
   }
 }
 
@@ -60,36 +65,31 @@ void readAdc() {
 void filterValues() {
   for (int pinIndex = 0; pinIndex < NUM_AXES; pinIndex++) {
     int reading = 0;
+    int average = 0;
     for (int i = 0; i < SAMPLES_PER_READING ; i++)
     {
       reading += rawAnalogValue[pinIndex][i];
     }
-    filteredValue[pinIndex] = map(reading / SAMPLES_PER_READING, 0, 4095, 127, -127);
+    average = reading / SAMPLES_PER_READING;
+    minValue[pinIndex] = min(minValue[pinIndex], average);
+    maxValue[pinIndex] = max(maxValue[pinIndex], average);
+    filteredValue[pinIndex] = map(average, minValue[pinIndex], maxValue[pinIndex], maxMapped[pinIndex], minMapped[pinIndex]);
   }
 }
 
 void printValues() {
 #ifdef DEBUG
-  Serial.print("Sent: ");
-  Serial.print(filteredValue);
-  Serial.print("\tRaw Avg: ");
-  Serial.print(potValue);
-  Serial.print("\tRaw: {");
-
-  // Iterate through raw pot values, printing them to the serial port
-  for (int i = 0 ; i < SAMPLES_PER_READING ; i++)
-  {
-    //      Serial.print(potValues[i]);
-
-    // Format the values into a comma seperated list
-    if (i == SAMPLES_PER_READING - 1)
-    {
-      Serial.println("}");
-    }
-    else
-    {
-      Serial.print(", ");
-    }
-  }
+  Serial.print("Left brake: ");
+  Serial.print((signed int)filteredValue[leftBrake]);
+  Serial.print("\tmin: "); Serial.print(minValue[leftBrake]);
+  Serial.print("\tmax: "); Serial.print(maxValue[leftBrake]);
+  Serial.print("\tRight brake: ");
+  Serial.print((signed int)filteredValue[rightBrake]);
+  Serial.print("\tmin: "); Serial.print(minValue[rightBrake]);
+  Serial.print("\tmax: "); Serial.print(maxValue[rightBrake]);
+  Serial.print("\tRudder: ");
+  Serial.print((signed int)filteredValue[rudder]);
+  Serial.print("\tmin: "); Serial.print(minValue[rudder]);
+  Serial.print("\tmax: "); Serial.println(maxValue[rudder]);
 #endif
 }

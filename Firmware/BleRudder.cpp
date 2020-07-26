@@ -26,16 +26,23 @@ static const uint8_t _hidReportDescriptor[] = {
   USAGE(1),            0x01, //   USAGE (Pointer)
   COLLECTION(1),       0x00, //   COLLECTION (Physical)
   REPORT_ID(1),        0x01, //     REPORT_ID (1)
-  // ------------------------------------------------- X/Y/Z position
+  // ------------------------------------------------- X/Y axis (left/right toe brakes)
   USAGE_PAGE(1),       0x01, //     USAGE_PAGE (Generic Desktop)
   USAGE(1),            0x30, //     USAGE (X)
   USAGE(1),            0x31, //     USAGE (Y)
+  REPORT_SIZE(1),      0x08, //     REPORT_SIZE (8)
+  REPORT_COUNT(1),     0x02, //     REPORT_COUNT (3)
+  LOGICAL_MINIMUM(1),  0x00, //     LOGICAL_MINIMUM (0)
+  LOGICAL_MAXIMUM(1),  0xff, //     LOGICAL_MAXIMUM (255)
+  HIDINPUT(1),         0x02, //     INPUT (Data, Variable, Absolute) ;2 bytes (X,Y)
+  // ------------------------------------------------- Z axis (rudder)
+  USAGE_PAGE(1),       0x01, //     USAGE_PAGE (Generic Desktop)
   USAGE(1),            0x32, //     USAGE (Z)
+  REPORT_SIZE(1),      0x08, //     REPORT_SIZE (8)
+  REPORT_COUNT(1),     0x01, //     REPORT_COUNT (3)
   LOGICAL_MINIMUM(1),  0x81, //     LOGICAL_MINIMUM (-127)
   LOGICAL_MAXIMUM(1),  0x7f, //     LOGICAL_MAXIMUM (127)
-  REPORT_SIZE(1),      0x08, //     REPORT_SIZE (8)
-  REPORT_COUNT(1),     0x03, //     REPORT_COUNT (3)
-  HIDINPUT(1),         0x02, //     INPUT (Data, Variable, Absolute) ;3 bytes (X,Y,Z)
+  HIDINPUT(1),         0x02, //     INPUT (Data, Variable, Absolute) ;1 byte (Z)
 
   END_COLLECTION(0),         //     END_COLLECTION
   END_COLLECTION(0)          //     END_COLLECTION
