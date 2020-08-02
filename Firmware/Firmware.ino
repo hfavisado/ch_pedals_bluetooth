@@ -16,8 +16,6 @@ const int pins[] = {34, 36, 39};      // left brake on pin 34, right brake on pi
 int rawAnalogValue[NUM_AXES][SAMPLES_PER_READING];
 int maxValue[NUM_AXES] = MIDDLE_THRESHOLD;
 int minValue[NUM_AXES] = MIDDLE_THRESHOLD;
-int maxMapped[NUM_AXES] = {255, 255, 127};
-int minMapped[NUM_AXES] = {0, 0, -127};
 char filteredValue[NUM_AXES];
 
 
@@ -63,17 +61,17 @@ void readAdc() {
 }
 
 void filterValues() {
-  for (int pinIndex = 0; pinIndex < NUM_AXES; pinIndex++) {
+  for (int axisIndex = 0; axisIndex < NUM_AXES; axisIndex++) {
     int reading = 0;
     int average = 0;
     for (int i = 0; i < SAMPLES_PER_READING ; i++)
     {
-      reading += rawAnalogValue[pinIndex][i];
+      reading += rawAnalogValue[axisIndex][i];
     }
     average = reading / SAMPLES_PER_READING;
-    minValue[pinIndex] = min(minValue[pinIndex], average);
-    maxValue[pinIndex] = max(maxValue[pinIndex], average);
-    filteredValue[pinIndex] = map(average, minValue[pinIndex], maxValue[pinIndex], maxMapped[pinIndex], minMapped[pinIndex]);
+    minValue[axisIndex] = min(minValue[axisIndex], average);
+    maxValue[axisIndex] = max(maxValue[axisIndex], average);
+    filteredValue[axisIndex] = map(average, minValue[axisIndex], maxValue[axisIndex], 127, -127);
   }
 }
 
